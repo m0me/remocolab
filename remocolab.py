@@ -352,68 +352,68 @@ def _setupVNC():
   virtualGL_ver = "2.6.4"
   turboVNC_ver = "2.2.5"
 
-  libjpeg_url = "https://github.com/demotomohiro/turbovnc/releases/download/2.2.5/libjpeg-turbo-official_{0}_amd64.deb".format(libjpeg_ver)
-  virtualGL_url = "https://github.com/demotomohiro/turbovnc/releases/download/2.2.5/virtualgl_{0}_amd64.deb".format(virtualGL_ver)
-  turboVNC_url = "https://github.com/demotomohiro/turbovnc/releases/download/2.2.5/turbovnc_{0}_amd64.deb".format(turboVNC_ver)
+  #libjpeg_url = "https://github.com/demotomohiro/turbovnc/releases/download/2.2.5/libjpeg-turbo-official_{0}_amd64.deb".format(libjpeg_ver)
+  #virtualGL_url = "https://github.com/demotomohiro/turbovnc/releases/download/2.2.5/virtualgl_{0}_amd64.deb".format(virtualGL_ver)
+  #turboVNC_url = "https://github.com/demotomohiro/turbovnc/releases/download/2.2.5/turbovnc_{0}_amd64.deb".format(turboVNC_ver)
 
-  _download(libjpeg_url, "libjpeg-turbo.deb")
-  _download(virtualGL_url, "virtualgl.deb")
-  _download(turboVNC_url, "turbovnc.deb")
-  my_apt = _MyApt()
-  my_apt.installDebPackage("libjpeg-turbo.deb")
-  my_apt.installDebPackage("virtualgl.deb")
-  my_apt.installDebPackage("turbovnc.deb")
+  #_download(libjpeg_url, "libjpeg-turbo.deb")
+  #_download(virtualGL_url, "virtualgl.deb")
+  #_download(turboVNC_url, "turbovnc.deb")
+  #my_apt = _MyApt()
+  #my_apt.installDebPackage("libjpeg-turbo.deb")
+  #my_apt.installDebPackage("virtualgl.deb")
+  #my_apt.installDebPackage("turbovnc.deb")
 
-  my_apt.installPkg("xfce4", "xfce4-terminal")
-  my_apt.commit()
-  my_apt.close()
+  #my_apt.installPkg("xfce4", "xfce4-terminal")
+  #my_apt.commit()
+  #my_apt.close()
 
-  vnc_sec_conf_p = pathlib.Path("/etc/turbovncserver-security.conf")
-  vnc_sec_conf_p.write_text("""\
-no-remote-connections
-no-httpd
-no-x11-tcp-connections
-""")
+  #vnc_sec_conf_p = pathlib.Path("/etc/turbovncserver-security.conf")
+  #vnc_sec_conf_p.write_text("""\
+#no-remote-connections
+#no-httpd
+#no-x11-tcp-connections
+#""")
 
   gpu_name = _get_gpu_name()
   if gpu_name != None:
     _setup_nvidia_gl()
 
-  vncrun_py = tempfile.gettempdir() / pathlib.Path("vncrun.py")
-  vncrun_py.write_text("""\
-import subprocess, secrets, pathlib
+  #vncrun_py = tempfile.gettempdir() / pathlib.Path("vncrun.py")
+  #vncrun_py.write_text("""\
+#import subprocess, secrets, pathlib
 
-vnc_passwd = secrets.token_urlsafe()[:8]
-vnc_viewonly_passwd = secrets.token_urlsafe()[:8]
-print("✂️"*24)
-print("VNC password: {}".format(vnc_passwd))
-print("VNC view only password: {}".format(vnc_viewonly_passwd))
-print("✂️"*24)
-vncpasswd_input = "{0}\\n{1}".format(vnc_passwd, vnc_viewonly_passwd)
-vnc_user_dir = pathlib.Path.home().joinpath(".vnc")
-vnc_user_dir.mkdir(exist_ok=True)
-vnc_user_passwd = vnc_user_dir.joinpath("passwd")
-with vnc_user_passwd.open('wb') as f:
-  subprocess.run(
-    ["/opt/TurboVNC/bin/vncpasswd", "-f"],
-    stdout=f,
-    input=vncpasswd_input,
-    universal_newlines=True)
-vnc_user_passwd.chmod(0o600)
-subprocess.run(
-  ["/opt/TurboVNC/bin/vncserver"],
-  cwd = pathlib.Path.home()
-)
+#vnc_passwd = secrets.token_urlsafe()[:8]
+#vnc_viewonly_passwd = secrets.token_urlsafe()[:8]
+#print("✂️"*24)
+#print("VNC password: {}".format(vnc_passwd))
+#print("VNC view only password: {}".format(vnc_viewonly_passwd))
+#print("✂️"*24)
+#vncpasswd_input = "{0}\\n{1}".format(vnc_passwd, vnc_viewonly_passwd)
+#vnc_user_dir = pathlib.Path.home().joinpath(".vnc")
+#vnc_user_dir.mkdir(exist_ok=True)
+#vnc_user_passwd = vnc_user_dir.joinpath("passwd")
+#with vnc_user_passwd.open('wb') as f:
+ # subprocess.run(
+  #  ["/opt/TurboVNC/bin/vncpasswd", "-f"],
+   # stdout=f,
+    #input=vncpasswd_input,
+    #universal_newlines=True)
+#vnc_user_passwd.chmod(0o600)
+#subprocess.run(
+ # ["/opt/TurboVNC/bin/vncserver"],
+  #cwd = pathlib.Path.home()
+#)
 
 #Disable screensaver because no one would want it.
-(pathlib.Path.home() / ".xscreensaver").write_text("mode: off\\n")
-""")
-  r = subprocess.run(
-                    ["su", "-c", "python3 " + str(vncrun_py), "colab"],
-                    check = True,
-                    stdout = subprocess.PIPE,
-                    universal_newlines = True)
-  return r.stdout
+#(pathlib.Path.home() / ".xscreensaver").write_text("mode: off\\n")
+#""")
+ # r = subprocess.run(
+  #                  ["su", "-c", "python3 " + str(vncrun_py), "colab"],
+   #                 check = True,
+    #                stdout = subprocess.PIPE,
+     #               universal_newlines = True)
+ # return r.stdout
 
 def setupVNC(ngrok_region = None, check_gpu_available = True, tunnel = None, mount_gdrive_to = None, mount_gdrive_from = None, public_key = None):
   stat, msg = _setupSSHDMain(public_key, tunnel, ngrok_region, check_gpu_available, mount_gdrive_to, mount_gdrive_from, True)
