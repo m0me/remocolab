@@ -378,6 +378,7 @@ def _setupVNC():
   gpu_name = _get_gpu_name()
   if gpu_name != None:
     _setup_nvidia_gl()
+    print("Done Nvidia setup")
 
   #vncrun_py = tempfile.gettempdir() / pathlib.Path("vncrun.py")
   #vncrun_py.write_text("""\
